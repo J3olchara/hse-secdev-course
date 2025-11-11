@@ -1,0 +1,35 @@
+version: '3.3'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql+psycopg://wishlist_user:wishlist_password@postgres:5432/wishlist_db
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=wishlist_db
+      - POSTGRES_USER=wishlist_user
+      - POSTGRES_PASSWORD=wishlist_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  test:
+    build: .
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql+psycopg://wishlist_user:wishlist_password@postgres:5432/wishlist_db
+    depends_on:
+      - postgres
+    command: pytest
+
+volumes:
+  postgres_data:

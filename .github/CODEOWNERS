@@ -1,0 +1,27 @@
+# Code owners
+# эти юзеры будут запрошены для ревью при PR
+* @arseniizxc
+
+# важные файлы по безопасности
+SECURITY.md @arseniizxc
+.github/workflows/ @arseniizxc
+Dockerfile @arseniizxc
+
+# основное приложение
+/app/ @arseniizxc
+
+# миграции БД
+/alembic/ @arseniizxc
+
+# конфиги
+pyproject.toml @arseniizxc
+requirements*.txt @arseniizxc
+pytest.ini @arseniizxc
+.pre-commit-config.yaml @arseniizxc
+
+# тесты
+/tests/ @arseniizxc
+
+# документация
+README.md @arseniizxc
+*.md @arseniizxc

@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+.env
+.pytest_cache/
+.coverage
+# IDE
+.vscode/
+.idea/
+# OS
+.DS_Store
+
+# linters
+.ruff_cache/
+.mypy_cache/
+.pyre/
+.pytest_cache/
+.coverage
+.coverage.*
+.coverage.*.*
+.coverage.*.*.*
+.coverage.*.*.*.*
+
+# db
+test.db

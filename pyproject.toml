@@ -1,0 +1,18 @@
+[tool.ruff]
+line-length = 79
+lint.select = ["E","F","W"]
+lint.ignore = ["E501"]
+target-version = "py311"
+exclude = ["venv",".venv","build","dist"]
+
+[tool.black]
+line-length = 79
+skip-string-normalization = true
+exclude = 'migrations|venv'
+
+[tool.isort]
+profile = 'black'
+line_length = 79
+known_local_folder=[]
+skip = ['.gitignore', 'README.md', 'requirements', 'example.env', 'information', '.github']
+skip_glob = ['*/migrations', '*/venv', '*/requirements', '*/templates']
