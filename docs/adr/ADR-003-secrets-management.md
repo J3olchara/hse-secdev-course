@@ -1,6 +1,6 @@
 # ADR-003: Управление секретами и ротация ключей
 
-Дата: 2025-01-22  
+Дата: 2025-01-22
 Статус: Accepted
 
 ## Context
@@ -41,7 +41,7 @@ class Settings:
     # Обязательные секреты - нет дефолтных значений
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     DATABASE_URL: str = os.getenv("DATABASE_URL")
-    
+
     def __post_init__(self):
         # Валидируем что все секреты установлены
         if not self.SECRET_KEY:
@@ -262,4 +262,3 @@ class Settings:
 **Связанные ADR:**
 - ADR-001 (RFC7807) — секреты не должны попадать в error responses
 - ADR-002 (Rate Limiting) — Redis credentials как пример секрета
-

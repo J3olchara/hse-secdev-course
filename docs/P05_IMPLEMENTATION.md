@@ -1,7 +1,7 @@
 # P05 — Реализация Secure Coding & ADR
 
-> **Автор:** J3olchara  
-> **Дата:** 22.01.2025  
+> **Автор:** J3olchara
+> **Дата:** 22.01.2025
 > **Ветка:** `p05-secure-coding`
 
 ## Обзор
@@ -12,7 +12,7 @@
 
 ### ADR-001: Обработка ошибок в формате RFC 7807
 
-**Статус:** ✅ Accepted  
+**Статус:** ✅ Accepted
 **Файл:** `docs/adr/ADR-001-rfc7807-error-handling.md`
 
 **Что реализовано:**
@@ -34,7 +34,7 @@
 
 ### ADR-002: Rate Limiting для защиты от брутфорс атак
 
-**Статус:** ✅ Accepted  
+**Статус:** ✅ Accepted
 **Файл:** `docs/adr/ADR-002-rate-limiting-auth.md`
 
 **Что реализованно:**
@@ -56,7 +56,7 @@
 
 ### ADR-003: Управление секретами и ротация ключей
 
-**Статус:** ✅ Accepted  
+**Статус:** ✅ Accepted
 **Файл:** `docs/adr/ADR-003-secrets-management.md`
 
 **Что реализованно:**
@@ -79,7 +79,7 @@
 
 ### ADR-004: Строгая валидация входных данных
 
-**Статус:** ✅ Accepted  
+**Статус:** ✅ Accepted
 **Файл:** `docs/adr/ADR-004-input-validation.md`
 
 **Что реализованно:**
@@ -115,7 +115,7 @@
   - 1 utility модуль (`app/utils/errors.py`)
   - 1 скрипт (`scripts/generate_secrets.py`)
   - 3 файла тестов
-  
+
 - **Обновлено файлов:** 4
   - `app/middleware/error_handler.py` — RFC7807 поддержка
   - `app/schemas/wish.py` — валидация с sanitization
@@ -225,7 +225,6 @@ pytest tests/unit/test_config_security.py -v
 
 ---
 
-**Статус:** ✅ Готово к ревью  
-**CI:** ✅ Все тесты проходят  
+**Статус:** ✅ Готово к ревью
+**CI:** ✅ Все тесты проходят
 **Coverage:** ~85% новых модулей
-

@@ -8,10 +8,10 @@ import secrets
 def generate_secret_key(length: int = 32) -> str:
     """
     Генерирует криптографически стойкий SECRET_KEY
-    
+
     Args:
         length: Длина в байтах (32 байта = 256 бит)
-    
+
     Returns:
         URL-safe строка секрета
     """
@@ -23,19 +23,19 @@ def main():
     print("Генератор секретов для Wishlist API (ADR-003)")
     print("=" * 60)
     print()
-    
+
     # JWT Secret Key
     secret_key = generate_secret_key(32)
     print("SECRET_KEY (для JWT подписи):")
     print(secret_key)
     print()
-    
+
     # Для ротации - генерируем второй ключ
     print("SECRET_KEY для ротации (опционально):")
     secret_key_2 = generate_secret_key(32)
     print(secret_key_2)
     print()
-    
+
     print("-" * 60)
     print("Добавьте эти переменные в ваш .env файл:")
     print("-" * 60)
@@ -54,4 +54,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
