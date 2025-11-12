@@ -44,7 +44,7 @@ def sniff(data: bytes) -> str|None:
 
 def secure_save(root: Path, data: bytes) -> Path:
     if len(data)>MAX: raise ValueError("too_big")
-    mt = sniff(data); 
+    mt = sniff(data);
     if not mt: raise ValueError("bad_type")
     root = root.resolve(strict=True)
     ext = ".png" if mt=="image/png" else ".jpg"

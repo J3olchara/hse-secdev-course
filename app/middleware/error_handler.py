@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class ErrorHandlerMiddleware(BaseHTTPMiddleware):
     """
     Middleware для обработки ошибок в формате RFC7807 с correlation_id (ADR-001, ADR-005).
-    
+
     Улучшения:
     - Маскирование PII в логах (NFR-02)
     - Централизованная карта ошибок (ADR-005)
@@ -82,11 +82,11 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
     ) -> JSONResponse:
         """
         Создает ответ в формате RFC7807 согласно NFR-02, ADR-001 и ADR-005.
-        
+
         Использует централизованную карту ошибок для консистентности.
         """
         error_type_base = "https://api.wishlist.com/errors/"
-        
+
         # Получаем описание из централизованной карты
         error_description = get_error_description(error_code)
 

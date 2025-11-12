@@ -40,7 +40,7 @@ target_metadata = Base.metadata
 def get_url():
     """
     Получить DATABASE_URL из переменной окружения.
-    
+
     Логика:
     - Если DATABASE_URL установлена (Docker) → используем её (PostgreSQL)
     - Если STAGE=production → PostgreSQL
@@ -48,7 +48,7 @@ def get_url():
     """
     stage = os.getenv("STAGE", "local")
     database_url_env = os.getenv("DATABASE_URL")
-    
+
     if database_url_env:
         return database_url_env
     elif stage == "production":
@@ -92,7 +92,7 @@ def run_migrations_online() -> None:
     """
     configuration = config.get_section(config.config_ini_section)
     configuration["sqlalchemy.url"] = get_url()
-    
+
     connectable = engine_from_config(
         configuration,
         prefix="sqlalchemy.",
@@ -114,4 +114,3 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
-

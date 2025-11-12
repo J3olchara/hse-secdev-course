@@ -1,6 +1,6 @@
 # ADR-004: Строгая валидация входных данных
 
-Дата: 2025-01-22  
+Дата: 2025-01-22
 Статус: Accepted
 
 ## Context
@@ -46,7 +46,7 @@ from pydantic import BaseModel, Field, constr, validator
 class WishCreate(BaseModel):
     title: constr(min_length=1, max_length=200, strip_whitespace=True)
     description: constr(max_length=5000, strip_whitespace=True) | None = None
-    
+
     @validator('title', 'description')
     def sanitize_html(cls, v):
         if v and ('<script' in v.lower() or 'javascript:' in v.lower()):
@@ -70,7 +70,7 @@ async def create_wish(user_id: int, wish_data: WishCreate):
     count = await repo.count_user_wishes(user_id)
     if count >= 100:
         raise TooManyWishesError("Maximum 100 wishes per user")
-    
+
     # Проверка на дубликаты
     existing = await repo.find_by_title(user_id, wish_data.title)
     if existing:
@@ -240,7 +240,7 @@ def to_response(wish: Wish) -> WishResponse:
   - CHECK constraints на длину полей
   - NOT NULL constraints где нужно
   - UNIQUE constraints для username/email
-  
+
 ### Фаза 4: Testing (Неделя 2)
 - [ ] Unit тесты для каждого validator:
   - Positive tests (валидные данные)
@@ -305,4 +305,3 @@ def to_response(wish: Wish) -> WishResponse:
 **Связанные ADR:**
 - ADR-001 (RFC7807) — validation errors возвращаются в RFC7807 формате
 - ADR-002 (Rate Limiting) — дополнительная защита от mass injection attempts
-

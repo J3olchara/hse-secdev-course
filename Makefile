@@ -21,10 +21,9 @@ update:
 format:
 	poetry run black app/ tests/
 	poetry run isort app/ tests/
+	poetry run pre-commit run --all-files
 
 lint:
 	poetry run ruff check app/ tests/
 	poetry run black --check app/ tests/
 	poetry run isort --check-only app/ tests/
-	poetry run pre-commit run --all-files
-

@@ -10,7 +10,7 @@ from .base import BaseRepository
 def escape_like_pattern(pattern: str) -> str:
     """
     Экранирование спецсимволов SQL LIKE для защиты от wildcard injection (ADR-005).
-    
+
     Экранирует символы: %, _, [, ]
     Это предотвращает злоупотребление wildcard символами в поисковых запросах.
     """
@@ -69,7 +69,8 @@ class WishRepository(BaseRepository[Wish]):
             return (
                 self.db.query(Wish)
                 .filter(
-                    Wish.user_id == user_id, Wish.title.ilike(f"%{escaped_title}%")
+                    Wish.user_id == user_id,
+                    Wish.title.ilike(f"%{escaped_title}%"),
                 )
                 .offset(skip)
                 .limit(limit)

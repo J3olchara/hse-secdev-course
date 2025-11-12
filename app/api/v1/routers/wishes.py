@@ -59,17 +59,29 @@ async def get_wish(
 
 @router.get("", response_model=WishListResponse)
 async def get_wishes(
-    skip: int = Query(0, ge=0, le=10000, description="Number of wishes to skip (max 10000 для защиты от DoS, ADR-005)"),
-    limit: int = Query(
-        10, ge=1, le=50, description="Number of wishes to return (max 50 для защиты от DoS, ADR-005)"
+    skip: int = Query(
+        0,
+        ge=0,
+        le=10000,
+        description="Number of wishes to skip (max 10000 для защиты от DoS, ADR-005)",
     ),
-    search: Optional[str] = Query(None, max_length=100, description="Search wishes by title (max 100 символов)"),
+    limit: int = Query(
+        10,
+        ge=1,
+        le=50,
+        description="Number of wishes to return (max 50 для защиты от DoS, ADR-005)",
+    ),
+    search: Optional[str] = Query(
+        None,
+        max_length=100,
+        description="Search wishes by title (max 100 символов)",
+    ),
     db: Session = Depends(get_database),
     current_user_id: int = Depends(get_current_user_id),
 ):
     """
     Получение списка желаний с защитой от DoS атак (NFR-06, STRIDE D).
-    
+
     Ограничения для предотвращения DoS:
     - skip <= 10000 (ограничение offset)
     - limit <= 50 (ограничение размера ответа)

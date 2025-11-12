@@ -1,9 +1,9 @@
 # ADR-005: Улучшение валидации ввода и контроли безопасного кодирования
 
-**Дата:** 2025-01-15  
-**Статус:** Принято  
-**Контекст:** P06 — Secure Coding  
-**Связанные NFR:** NFR-02, NFR-06, NFR-08  
+**Дата:** 2025-01-15
+**Статус:** Принято
+**Контекст:** P06 — Secure Coding
+**Связанные NFR:** NFR-02, NFR-06, NFR-08
 **Связанные угрозы (STRIDE):** T (Tampering), D (Denial of Service)
 
 ---
@@ -107,7 +107,7 @@ async def get_wishes(
 - `limit <= 50` (было 100) — ограничение размера ответа
 - `search <= 100` — ограничение длины поискового запроса
 
-**Связь с NFR-06:** Rate limiting и защита от DoS атак  
+**Связь с NFR-06:** Rate limiting и защита от DoS атак
 **Связь с STRIDE:** D (Denial of Service) — защита от перегрузки через легитимные API вызовы
 
 ---
@@ -141,7 +141,7 @@ Wish.title.ilike(f"%{escaped_title}%")
 - Backslash экранируется первым, чтобы не экранировать наши escape символы
 - Квадратные скобки экранируются для совместимости с некоторыми СУБД
 
-**Связь с NFR-08:** Валидация входных данных  
+**Связь с NFR-08:** Валидация входных данных
 **Связь с STRIDE:** T (Tampering) — модификация поискового запроса для DoS
 
 ---
@@ -350,4 +350,3 @@ return JSONResponse({
 - [GDPR — Data Minimization](https://gdpr.eu/data-minimization/)
 - [Python Decimal documentation](https://docs.python.org/3/library/decimal.html)
 - [Pydantic v2 — Strict Mode](https://docs.pydantic.dev/latest/concepts/strict_mode/)
-
