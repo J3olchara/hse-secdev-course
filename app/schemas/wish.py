@@ -1,15 +1,24 @@
-from datetime import datetime
+from datetime import datetime, timezone
+from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class WishBase(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     title: str = Field(
         ..., min_length=1, max_length=200, description="Wish title"
     )
     description: Optional[str] = Field(
         None, max_length=5000, description="Wish description"
+    )
+    price: Optional[Decimal] = Field(
+        None,
+        ge=0,
+        max_digits=12,
+        decimal_places=2,
+        description="Wish price (безопасная работа с деньгами, ADR-005)",
     )
 
     @field_validator('title', 'description')
@@ -37,8 +46,17 @@ class WishCreate(WishBase):
 
 
 class WishUpdate(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=5000)
+    price: Optional[Decimal] = Field(
+        None,
+        ge=0,
+        max_digits=12,
+        decimal_places=2,
+        description="Wish price",
+    )
 
     @field_validator('title', 'description')
     @classmethod
@@ -63,10 +81,26 @@ class WishResponse(WishBase):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra='forbid')
+
+    @field_validator('created_at', 'updated_at', mode='before')
+    @classmethod
+    def normalize_datetime(cls, v: datetime) -> datetime:
+        """Нормализация datetime в UTC (ADR-005, NFR-08)"""
+        if v is None:
+            return v
+        if isinstance(v, datetime):
+            if v.tzinfo is None:
+                # Если naive datetime, считаем его UTC
+                return v.replace(tzinfo=timezone.utc)
+            # Конвертируем в UTC
+            return v.astimezone(timezone.utc)
+        return v
 
 
 class WishListResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
     wishes: list[WishResponse]
     total: int
     page: int

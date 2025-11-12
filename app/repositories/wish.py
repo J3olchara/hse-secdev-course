@@ -7,6 +7,22 @@ from ..models.wish import Wish
 from .base import BaseRepository
 
 
+def escape_like_pattern(pattern: str) -> str:
+    """
+    Экранирование спецсимволов SQL LIKE для защиты от wildcard injection (ADR-005).
+    
+    Экранирует символы: %, _, [, ]
+    Это предотвращает злоупотребление wildcard символами в поисковых запросах.
+    """
+    # Экранируем backslash первым, чтобы не экранировать наши escape символы
+    pattern = pattern.replace('\\', '\\\\')
+    pattern = pattern.replace('%', '\\%')
+    pattern = pattern.replace('_', '\\_')
+    pattern = pattern.replace('[', '\\[')
+    pattern = pattern.replace(']', '\\]')
+    return pattern
+
+
 class WishRepository(BaseRepository[Wish]):
     def __init__(self, db: Session):
         super().__init__(Wish, db)
@@ -44,11 +60,16 @@ class WishRepository(BaseRepository[Wish]):
     def search_by_title(
         self, user_id: int, title: str, skip: int = 0, limit: int = 100
     ) -> List[Wish]:
+        """
+        Поиск желаний по заголовку с защитой от wildcard injection (ADR-005, STRIDE T).
+        """
         try:
+            # Экранируем спецсимволы для защиты от wildcard injection
+            escaped_title = escape_like_pattern(title)
             return (
                 self.db.query(Wish)
                 .filter(
-                    Wish.user_id == user_id, Wish.title.ilike(f"%{title}%")
+                    Wish.user_id == user_id, Wish.title.ilike(f"%{escaped_title}%")
                 )
                 .offset(skip)
                 .limit(limit)

@@ -1,15 +1,29 @@
 version: '3.3'
 
 services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+
   app:
     build: .
     ports:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
+      - STAGE=production
       - DATABASE_URL=postgresql+psycopg://wishlist_user:wishlist_password@postgres:5432/wishlist_db
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
   postgres:
     image: postgres:15
@@ -21,15 +35,23 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wishlist_user -d wishlist_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  test:
+  migrations:
     build: .
     environment:
       - PYTHONUNBUFFERED=1
+      - STAGE=production
       - DATABASE_URL=postgresql+psycopg://wishlist_user:wishlist_password@postgres:5432/wishlist_db
     depends_on:
-      - postgres
-    command: pytest
+      postgres:
+        condition: service_healthy
+    command: alembic upgrade head
+    restart: "no"
 
 volumes:
   postgres_data:
