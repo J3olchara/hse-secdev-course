@@ -39,22 +39,19 @@ target_metadata = Base.metadata
 
 def get_url():
     """
-    Получить DATABASE_URL из переменной окружения.
+    Получить DATABASE_URL из настроек приложения.
 
     Логика:
-    - Если DATABASE_URL установлена (Docker) → используем её (PostgreSQL)
-    - Если STAGE=production → PostgreSQL
-    - Иначе → SQLite для локальной разработки
+    - Используем settings для формирования URL из компонентов
+    - В локальной разработке можно использовать SQLite
     """
+    from app.core.config import settings
+    
     stage = os.getenv("STAGE", "local")
-    database_url_env = os.getenv("DATABASE_URL")
-
-    if database_url_env:
-        return database_url_env
-    elif stage == "production":
-        return "postgresql+psycopg://wishlist_user:wishlist_password@localhost:5432/wishlist_db"
+    
+    if stage == "production" or os.getenv("POSTGRES_HOST"):
+        return settings.DATABASE_URL
     else:
-        # SQLite для локальной разработки
         return "sqlite:///./test.db"
 
 

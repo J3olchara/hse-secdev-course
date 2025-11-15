@@ -4,10 +4,10 @@ run:
 	poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 start:
-	docker-compose up app
+	docker compose up app
 
 rebuild:
-	docker-compose up --build app
+	docker compose up --build app
 
 test:
 	poetry run pytest tests/ -v

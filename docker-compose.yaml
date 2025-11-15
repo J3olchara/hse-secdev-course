@@ -21,10 +21,6 @@ services:
       - "8000:8000"
     env_file:
       - .env
-    environment:
-      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
-      - STAGE=${STAGE:-production}
-      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       postgres:
         condition: service_healthy
@@ -47,16 +43,12 @@ services:
     image: postgres:15.7-alpine
     env_file:
       - .env
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wishlist_user} -d ${POSTGRES_DB:-wishlist_db}"]
+      test: ["CMD-SHELL", "pg_isready -U wishlist_user -d wishlist_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -69,10 +61,6 @@ services:
     build: .
     env_file:
       - .env
-    environment:
-      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
-      - STAGE=${STAGE:-production}
-      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       postgres:
         condition: service_healthy
