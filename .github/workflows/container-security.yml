@@ -23,16 +23,16 @@ jobs:
     name: Dockerfile Lint
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Run hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
           failure-threshold: warning
-          
+
       - name: Upload hadolint results
         if: always()
         uses: actions/upload-artifact@v4
@@ -45,13 +45,13 @@ jobs:
     name: Build & Test Container
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Build image
         uses: docker/build-push-action@v5
         with:
@@ -62,7 +62,7 @@ jobs:
           tags: wishlist-app:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      
+
       - name: Test non-root user
         run: |
           USER_ID=$(docker run --rm wishlist-app:test id -u)
@@ -72,7 +72,7 @@ jobs:
             exit 1
           fi
           echo "OK: Container running as non-root user (UID: $USER_ID)"
-      
+
       - name: Test healthcheck
         run: |
           docker run -d --name test-app wishlist-app:test
@@ -91,13 +91,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: build-and-test
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Build image for scanning
         uses: docker/build-push-action@v5
         with:
@@ -107,7 +107,7 @@ jobs:
           load: true
           tags: wishlist-app:scan
           cache-from: type=gha
-      
+
       - name: Run Trivy scanner
         uses: aquasecurity/trivy-action@master
         with:
@@ -115,7 +115,7 @@ jobs:
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
-      
+
       - name: Run Trivy scanner (table output)
         uses: aquasecurity/trivy-action@master
         with:
@@ -123,13 +123,13 @@ jobs:
           format: 'table'
           output: 'trivy-report.txt'
           severity: 'CRITICAL,HIGH,MEDIUM'
-      
+
       - name: Upload Trivy results (SARIF)
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
-      
+
       - name: Upload Trivy report
         if: always()
         uses: actions/upload-artifact@v4
@@ -138,7 +138,7 @@ jobs:
           path: |
             trivy-report.txt
             trivy-results.sarif
-      
+
       - name: Check vulnerability threshold
         run: |
           if [ -f trivy-report.txt ]; then
@@ -156,15 +156,15 @@ jobs:
     name: Docker Compose Check
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Validate compose file
         run: |
           docker compose config > /dev/null
           echo "docker-compose.yaml is valid"
-      
+
       - name: Check for secrets in compose
         run: |
           if grep -i "password.*=" docker-compose.yaml | grep -v '\${'; then
@@ -172,4 +172,3 @@ jobs:
             exit 1
           fi
           echo "No hardcoded secrets found"
-

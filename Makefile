@@ -19,14 +19,14 @@ update:
 	poetry run alembic revision --autogenerate -m "Auto-generated migration"
 
 format:
-	poetry run black app/ tests/
-	poetry run isort app/ tests/
+	poetry run black .
+	poetry run isort .
 	poetry run pre-commit run --all-files
 
 lint:
-	poetry run ruff check app/ tests/
-	poetry run black --check app/ tests/
-	poetry run isort --check-only app/ tests/
+	poetry run ruff check .
+	poetry run black --check .
+	poetry run isort --check-only .
 
 docker-build:
 	docker build -t wishlist-app:latest .

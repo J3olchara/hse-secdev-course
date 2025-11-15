@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM python:3.11.9-slim AS builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ RUN poetry install --no-root --no-interaction --no-ansi --only main
 
 COPY . .
 
-FROM python:3.11.9-slim AS runtime
+FROM python:3.11-slim AS runtime
 
 LABEL maintainer="wishlist-app" \
       version="1.0" \
