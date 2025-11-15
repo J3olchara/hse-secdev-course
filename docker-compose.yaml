@@ -1,55 +1,87 @@
-version: '3.3'
+version: '3.8'
 
 services:
   nginx:
-    image: nginx:alpine
+    image: nginx:1.25-alpine
     ports:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - app
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    restart: unless-stopped
 
   app:
     build: .
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      - PYTHONUNBUFFERED=1
-      - STAGE=production
-      - DATABASE_URL=postgresql+psycopg://wishlist_user:wishlist_password@postgres:5432/wishlist_db
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
+      - STAGE=${STAGE:-production}
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       postgres:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
   postgres:
-    image: postgres:15
+    image: postgres:15.7-alpine
+    env_file:
+      - .env
     environment:
-      - POSTGRES_DB=wishlist_db
-      - POSTGRES_USER=wishlist_user
-      - POSTGRES_PASSWORD=wishlist_password
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U wishlist_user -d wishlist_db"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wishlist_user} -d ${POSTGRES_DB:-wishlist_db}"]
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
 
   migrations:
     build: .
+    env_file:
+      - .env
     environment:
-      - PYTHONUNBUFFERED=1
-      - STAGE=production
-      - DATABASE_URL=postgresql+psycopg://wishlist_user:wishlist_password@postgres:5432/wishlist_db
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
+      - STAGE=${STAGE:-production}
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       postgres:
         condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     command: alembic upgrade head
     restart: "no"
 
