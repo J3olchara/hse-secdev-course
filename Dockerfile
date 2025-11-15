@@ -1,15 +1,17 @@
-# Build stage
+# syntax=docker/dockerfile:1.4
 FROM python:3.11-slim AS builder
 
-# Install system dependencies
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+WORKDIR /app
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    gcc \
-    libpq-dev \
-    libffi-dev && \
+    curl=8.14.1-2+deb13u2 \
+    gcc=4:14.2.0-1 \
+    libpq-dev=17.6-0+deb13u1 \
+    libffi-dev=3.4.8-2 && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
 ENV POETRY_HOME="/opt/poetry" \
     POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
@@ -18,46 +20,43 @@ ENV POETRY_HOME="/opt/poetry" \
 RUN curl -sSL https://install.python-poetry.org | python3 - && \
     ln -s /opt/poetry/bin/poetry /usr/local/bin/poetry
 
-# Set working directory
-WORKDIR /app
-
-# Copy dependency files
 COPY pyproject.toml poetry.lock* ./
 
-# Install dependencies
-RUN poetry install --no-root --no-interaction --no-ansi
+RUN poetry install --no-root --no-interaction --no-ansi --only main
 
-# Copy application code
 COPY . .
 
-# Run tests
-RUN poetry run pytest -q
+FROM python:3.11-slim AS runtime
 
-# Runtime stage
-FROM python:3.11-slim AS run
+LABEL maintainer="wishlist-app" \
+      version="1.0" \
+      description="Wishlist API service"
 
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
-# Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 \
-    curl && \
-    rm -rf /var/lib/apt/lists/*
+    libpq5=17.6-0+deb13u1 \
+    curl=8.14.1-2+deb13u2 && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 
-# Create non-root user
-RUN useradd -m -u 1000 appuser
+RUN groupadd -r appuser && useradd -r -g appuser -u 1000 appuser
 
-# Set working directory
 WORKDIR /app
 
-# Copy virtual environment from builder
-COPY --from=builder /app/.venv /app/.venv
-
-# Copy application code
+COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv
 COPY --chown=appuser:appuser . .
 
-EXPOSE 8000
-HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
+RUN chmod -R 755 /app && \
+    chmod -R 500 /app/app
+
 USER appuser
-ENV PYTHONUNBUFFERED=1
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

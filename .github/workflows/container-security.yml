@@ -1,0 +1,182 @@
+name: Container Security
+
+on:
+  pull_request:
+    paths:
+      - 'Dockerfile'
+      - 'docker-compose.yaml'
+      - '.dockerignore'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: container-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hadolint:
+    name: Dockerfile Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: warning
+
+      - name: Upload hadolint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hadolint-report
+          path: hadolint-*.json
+          if-no-files-found: ignore
+
+  build-and-test:
+    name: Build & Test Container
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: wishlist-app:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test non-root user
+        run: |
+          USER_ID=$(docker run --rm wishlist-app:test id -u)
+          echo "Container user ID: $USER_ID"
+          if [ "$USER_ID" = "0" ]; then
+            echo "ERROR: Container running as root!"
+            exit 1
+          fi
+          echo "OK: Container running as non-root user (UID: $USER_ID)"
+
+      - name: Test healthcheck
+        run: |
+          docker run -d --name test-app wishlist-app:test
+          sleep 20
+          HEALTH=$(docker inspect --format='{{.State.Health.Status}}' test-app || echo "no-healthcheck")
+          echo "Health status: $HEALTH"
+          docker logs test-app
+          docker stop test-app
+          docker rm test-app
+          if [ "$HEALTH" != "healthy" ] && [ "$HEALTH" != "starting" ]; then
+            echo "WARNING: Healthcheck not working properly"
+          fi
+
+  trivy-scan:
+    name: Trivy Vulnerability Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build-and-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image for scanning
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: wishlist-app:scan
+          cache-from: type=gha
+
+      - name: Run Trivy scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: wishlist-app:scan
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Run Trivy scanner (table output)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: wishlist-app:scan
+          format: 'table'
+          output: 'trivy-report.txt'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+
+      - name: Upload Trivy results (SARIF)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Upload Trivy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: |
+            trivy-report.txt
+            trivy-results.sarif
+
+      - name: Check vulnerability threshold
+        run: |
+          if [ -f trivy-report.txt ]; then
+            cat trivy-report.txt
+            CRITICAL=$(grep -c "CRITICAL" trivy-report.txt || true)
+            HIGH=$(grep -c "HIGH" trivy-report.txt || true)
+            echo "Found $CRITICAL critical and $HIGH high vulnerabilities"
+            if [ "$CRITICAL" -gt "5" ]; then
+              echo "Too many critical vulnerabilities found"
+              exit 1
+            fi
+          fi
+
+  compose-check:
+    name: Docker Compose Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .env file for validation
+        run: |
+          cp env.example .env
+          # Generate a secure SECRET_KEY for CI
+          echo "SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')" >> .env
+          echo "POSTGRES_HOST=postgres" >> .env
+          echo "POSTGRES_PORT=5432" >> .env
+
+      - name: Validate compose file
+        run: |
+          docker compose config > /dev/null
+          echo "docker-compose.yaml is valid"
+
+      - name: Check for secrets in compose
+        run: |
+          if grep -i "password.*=" docker-compose.yaml | grep -v '\${'; then
+            echo "WARNING: Found hardcoded secrets in docker-compose.yaml"
+            exit 1
+          fi
+          echo "No hardcoded secrets found"

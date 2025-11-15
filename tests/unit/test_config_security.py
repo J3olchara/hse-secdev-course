@@ -68,11 +68,16 @@ class TestSecretsManagement:
         )
 
     def test_env_variable_present(self):
-        """ENV переменная должна быть установлена"""
+        """STAGE переменная должна быть установлена"""
         from app.core.config import settings
 
-        assert hasattr(settings, 'ENV')
-        assert settings.ENV in ['development', 'staging', 'production']
+        assert hasattr(settings, 'STAGE')
+        assert settings.STAGE in [
+            'local',
+            'development',
+            'staging',
+            'production',
+        ]
 
     def test_rate_limit_config(self):
         """Rate limiting конфигурация (ADR-002)"""
@@ -122,6 +127,7 @@ class TestDatabaseConfig:
         assert len(settings.DATABASE_URL) > 0
         assert (
             "postgresql://" in settings.DATABASE_URL
+            or "postgresql+psycopg://" in settings.DATABASE_URL
             or "sqlite://" in settings.DATABASE_URL
         )
 

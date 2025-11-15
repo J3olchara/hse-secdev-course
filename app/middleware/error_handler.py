@@ -58,7 +58,7 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
             )
         except Exception as e:
             # В production скрываем технические детали (ADR-001, R10)
-            is_production = os.getenv("ENV", "development") == "production"
+            is_production = os.getenv("STAGE", "local") == "production"
             detail = "Internal server error" if is_production else str(e)
 
             # Маскируем PII в exception message
