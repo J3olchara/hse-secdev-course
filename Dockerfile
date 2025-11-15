@@ -4,10 +4,10 @@ FROM python:3.11-slim AS builder
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    gcc \
-    libpq-dev \
-    libffi-dev && \
+    curl=8.14.1-2+deb13u2 \
+    gcc=4:14.2.0-1 \
+    libpq-dev=17.6-0+deb13u1 \
+    libffi-dev=3.4.8-2 && \
     rm -rf /var/lib/apt/lists/*
 
 ENV POETRY_HOME="/opt/poetry" \
@@ -35,8 +35,8 @@ ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 \
-    curl && \
+    libpq5=17.6-0+deb13u1 \
+    curl=8.14.1-2+deb13u2 && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 

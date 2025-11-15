@@ -46,9 +46,9 @@ def get_url():
     - В локальной разработке можно использовать SQLite
     """
     from app.core.config import settings
-    
+
     stage = os.getenv("STAGE", "local")
-    
+
     if stage == "production" or os.getenv("POSTGRES_HOST"):
         return settings.DATABASE_URL
     else:

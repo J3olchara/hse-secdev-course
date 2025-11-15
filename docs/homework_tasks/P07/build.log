@@ -1,176 +1,75 @@
+arseniizxc@compute-vm-2-4-50-ssd-1762272483591:~/hse-secdev-course$ make format
+poetry run black .
+All done! ✨ 🍰 ✨
+81 files left unchanged.
+poetry run isort .
+Skipped 2 files
+poetry run pre-commit run --all-files
+fix end of files.........................................................Passed
+trim trailing whitespace.................................................Passed
+check for merge conflicts................................................Passed
+check json...........................................(no files to check)Skipped
+check yaml...............................................................Passed
+mixed line ending........................................................Passed
+black....................................................................Passed
+isort....................................................................Passed
+ruff.....................................................................Passed
 arseniizxc@compute-vm-2-4-50-ssd-1762272483591:~/hse-secdev-course$ make rebuild
 docker compose up --build app
-[+] Building 17.3s (28/34)                                                                          
+[+] Building 79.4s (28/34)
  => [internal] load local bake definitions                                                     0.0s
  => => reading from stdin 999B                                                                 0.0s
  => [app internal] load build definition from Dockerfile                                       0.0s
- => => transferring dockerfile: 1.48kB                                                         0.0s
- => [app] resolve image config for docker-image://docker.io/docker/dockerfile:1.4              0.8s
+ => => transferring dockerfile: 1.57kB                                                         0.0s
+ => [migrations] resolve image config for docker-image://docker.io/docker/dockerfile:1.4       0.2s
  => CACHED [app] docker-image://docker.io/docker/dockerfile:1.4@sha256:9ba7531bd80fb0a8586327  0.0s
+ => [app internal] load .dockerignore                                                          0.0s
+ => => transferring context: 191B                                                              0.0s
  => [app internal] load build definition from Dockerfile                                       0.0s
- => => transferring dockerfile: 1.48kB                                                         0.0s
- => [app internal] load .dockerignore                                                          0.1s
+ => => transferring dockerfile: 1.57kB                                                         0.0s
+ => [migrations internal] load .dockerignore                                                   0.0s
  => => transferring context: 191B                                                              0.0s
  => [migrations internal] load build definition from Dockerfile                                0.1s
- => => transferring dockerfile: 1.48kB                                                         0.0s
- => [migrations internal] load .dockerignore                                                   0.1s
- => => transferring context: 191B                                                              0.0s
- => [app internal] load metadata for docker.io/library/python:3.11-slim                        0.6s
- => [app internal] load build context                                                          0.0s
- => => transferring context: 10.46kB                                                           0.0s
- => [migrations runtime 1/7] FROM docker.io/library/python:3.11-slim@sha256:e4676722fba839e2e  0.0s
- => [migrations internal] load build context                                                   0.0s
- => => transferring context: 10.46kB                                                           0.0s
- => CACHED [app builder 2/7] WORKDIR /app                                                      0.0s
- => CACHED [app builder 3/7] RUN apt-get update && apt-get install -y --no-install-recommends  0.0s
- => CACHED [app builder 4/7] RUN curl -sSL https://install.python-poetry.org | python3 - &&    0.0s
- => CACHED [app builder 5/7] COPY pyproject.toml poetry.lock* ./                               0.0s
- => CACHED [migrations builder 6/7] RUN poetry install --no-root --no-interaction --no-ansi -  0.0s
- => [migrations builder 7/7] COPY . .                                                          0.1s
- => CACHED [app runtime 2/7] RUN apt-get update && apt-get install -y --no-install-recommends  0.0s
- => CACHED [app runtime 3/7] RUN groupadd -r appuser && useradd -r -g appuser -u 1000 appuser  0.0s
- => CACHED [app runtime 4/7] WORKDIR /app                                                      0.0s
- => CACHED [app runtime 5/7] COPY --from=builder --chown=appuser:appuser /app/.venv /app/.ven  0.0s
- => [app runtime 6/7] COPY --chown=appuser:appuser . .                                         0.1s
- => [app runtime 7/7] RUN chmod -R 755 /app &&     chmod -R 500 /app/app                      11.8s
- => [migrations] exporting to image                                                            0.6s
- => => exporting layers                                                                        0.6s
- => => writing image sha256:01a0a44dac223ec64c808ef773d2c9dbb59c58c744c3327bb65d3e2014bb444a   0.0s
+ => => transferring dockerfile: 1.57kB                                                         0.0s
+ => [migrations internal] load metadata for docker.io/library/python:3.11-slim                 0.0s
+ => CACHED [app runtime 1/7] FROM docker.io/library/python:3.11-slim                           0.0s
+ => [app internal] load build context                                                          0.1s
+ => => transferring context: 36.32kB                                                           0.0s
+ => CACHED [migrations builder 2/7] WORKDIR /app                                               0.0s
+ => [app builder 3/7] RUN apt-get update && apt-get install -y --no-install-recommends     c  24.5s
+ => [migrations internal] load build context                                                   0.1s
+ => => transferring context: 36.32kB                                                           0.0s
+ => [migrations runtime 2/7] RUN apt-get update && apt-get install -y --no-install-recommends  9.7s
+ => [migrations runtime 3/7] RUN groupadd -r appuser && useradd -r -g appuser -u 1000 appuser  0.6s
+ => [app runtime 4/7] WORKDIR /app                                                             0.2s
+ => [app builder 4/7] RUN curl -sSL https://install.python-poetry.org | python3 - &&     ln   25.9s
+ => [app builder 5/7] COPY pyproject.toml poetry.lock* ./                                      0.2s
+ => [migrations builder 6/7] RUN poetry install --no-root --no-interaction --no-ansi --only m  7.6s
+ => [app builder 7/7] COPY . .                                                                 3.9s
+ => [app runtime 5/7] COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv        1.9s
+ => [migrations runtime 6/7] COPY --chown=appuser:appuser . .                                  0.2s
+ => [app runtime 7/7] RUN chmod -R 755 /app &&     chmod -R 500 /app/app                      13.5s
+ => [migrations] exporting to image                                                            0.8s
+ => => exporting layers                                                                        0.7s
+ => => writing image sha256:3a3c94fdafb6e16008059b51517e05596db6d7a5435966ca0b4a84d21dc7afce   0.0s
  => => naming to docker.io/library/hse-secdev-course-migrations                                0.0s
- => [app] exporting to image                                                                   0.6s
- => => exporting layers                                                                        0.6s
- => => writing image sha256:c998ec39fbcf06c739750939456abf2bc8715e94567264ab34b39e6484f97f4b   0.0s
+ => [app] exporting to image                                                                   0.7s
+ => => exporting layers                                                                        0.7s
+ => => writing image sha256:7c3ea644f3579c49a9ae641b260c197d8e973a0061d05e21d635eac29d80f4db   0.0s
  => => naming to docker.io/library/hse-secdev-course-app                                       0.0s
  => [app] resolving provenance for metadata file                                               0.0s
  => [migrations] resolving provenance for metadata file                                        0.0s
 [+] Running 5/5
- ✔ hse-secdev-course-migrations              Built                                             0.0s 
- ✔ hse-secdev-course-app                     Built                                             0.0s 
- ✔ Container hse-secdev-course-postgres-1    Recre...                                          0.2s 
- ✔ Container hse-secdev-course-migrations-1  Rec...                                            0.1s 
- ✔ Container hse-secdev-course-app-1         Recreated                                         0.1s 
-Attaching to app-1
-service "migrations" didn't complete successfully: exit 1
-make: *** [Makefile:10: rebuild] Error 1
-arseniizxc@compute-vm-2-4-50-ssd-1762272483591:~/hse-secdev-course$ make rebuild
-docker compose up --build app
-[+] Building 14.8s (28/34)                                                                          
- => [internal] load local bake definitions                                                     0.0s
- => => reading from stdin 999B                                                                 0.0s
- => [migrations internal] load build definition from Dockerfile                                0.0s
- => => transferring dockerfile: 1.48kB                                                         0.0s
- => [migrations] resolve image config for docker-image://docker.io/docker/dockerfile:1.4       0.5s
- => CACHED [app] docker-image://docker.io/docker/dockerfile:1.4@sha256:9ba7531bd80fb0a8586327  0.0s
- => [migrations internal] load .dockerignore                                                   0.1s
- => => transferring context: 191B                                                              0.0s
- => [migrations internal] load build definition from Dockerfile                                0.1s
- => => transferring dockerfile: 1.48kB                                                         0.0s
- => [app internal] load .dockerignore                                                          0.1s
- => => transferring context: 191B                                                              0.0s
- => [app internal] load build definition from Dockerfile                                       0.1s
- => => transferring dockerfile: 1.48kB                                                         0.0s
- => [migrations internal] load metadata for docker.io/library/python:3.11-slim                 0.4s
- => [app internal] load build context                                                          0.0s
- => => transferring context: 13.25kB                                                           0.0s
- => [migrations builder 1/7] FROM docker.io/library/python:3.11-slim@sha256:e4676722fba839e2e  0.0s
- => [migrations internal] load build context                                                   0.0s
- => => transferring context: 13.25kB                                                           0.0s
- => CACHED [app builder 2/7] WORKDIR /app                                                      0.0s
- => CACHED [app builder 3/7] RUN apt-get update && apt-get install -y --no-install-recommends  0.0s
- => CACHED [app builder 4/7] RUN curl -sSL https://install.python-poetry.org | python3 - &&    0.0s
- => CACHED [app builder 5/7] COPY pyproject.toml poetry.lock* ./                               0.0s
- => CACHED [migrations builder 6/7] RUN poetry install --no-root --no-interaction --no-ansi -  0.0s
- => [migrations builder 7/7] COPY . .                                                          0.1s
- => CACHED [migrations runtime 2/7] RUN apt-get update && apt-get install -y --no-install-rec  0.0s
- => CACHED [migrations runtime 3/7] RUN groupadd -r appuser && useradd -r -g appuser -u 1000   0.0s
- => CACHED [migrations runtime 4/7] WORKDIR /app                                               0.0s
- => CACHED [migrations runtime 5/7] COPY --from=builder --chown=appuser:appuser /app/.venv /a  0.0s
- => [app runtime 6/7] COPY --chown=appuser:appuser . .                                         0.1s
- => [app runtime 7/7] RUN chmod -R 755 /app &&     chmod -R 500 /app/app                      12.5s
- => [migrations] exporting to image                                                            0.4s
- => => exporting layers                                                                        0.4s
- => => writing image sha256:7fe903a339cf942a7b869626502cfc686a9fe6a91f2ed20c6b6b0f93075c642e   0.0s
- => => naming to docker.io/library/hse-secdev-course-migrations                                0.0s
- => [app] exporting to image                                                                   0.4s
- => => exporting layers                                                                        0.3s
- => => writing image sha256:c062014e692e10edb02ec91821bb4f875a9127030d9430ebea4afe54cd99083c   0.0s
- => => naming to docker.io/library/hse-secdev-course-app                                       0.0s
- => [app] resolving provenance for metadata file                                               0.0s
- => [migrations] resolving provenance for metadata file                                        0.0s
-[+] Running 5/5
- ✔ hse-secdev-course-migrations              Built                                             0.0s 
- ✔ hse-secdev-course-app                     Built                                             0.0s 
- ✔ Container hse-secdev-course-postgres-1    Recre...                                          0.3s 
- ✔ Container hse-secdev-course-migrations-1  Rec...                                            0.1s 
- ✔ Container hse-secdev-course-app-1         Recreated                                         0.1s 
+ ✔ hse-secdev-course-migrations              Built                                             0.0s
+ ✔ hse-secdev-course-app                     Built                                             0.0s
+ ✔ Container hse-secdev-course-postgres-1    Runni...                                          0.0s
+ ✔ Container hse-secdev-course-migrations-1  Rec...                                            0.2s
+ ✔ Container hse-secdev-course-app-1         Recreated                                         0.3s
 Attaching to app-1
 app-1  | INFO:     Started server process [1]
 app-1  | INFO:     Waiting for application startup.
 app-1  | INFO:     Application startup complete.
 app-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-app-1  | INFO:     127.0.0.1:34384 - "GET /health HTTP/1.1" 200 OK
-Gracefully Stopping... press Ctrl+C again to force
- Container hse-secdev-course-app-1  Stopping
-app-1  | INFO:     Shutting down
-app-1  | INFO:     Waiting for application shutdown.
-app-1  | INFO:     Application shutdown complete.
-app-1  | INFO:     Finished server process [1]
- Container hse-secdev-course-app-1  Stopped
-app-1 exited with code 0
-arseniizxc@compute-vm-2-4-50-ssd-1762272483591:~/hse-secdev-course$ make rebuild
-docker compose up --build app
-[+] Building 12.8s (28/34)                                                                          
- => [internal] load local bake definitions                                                     0.0s
- => => reading from stdin 999B                                                                 0.0s
- => [migrations internal] load build definition from Dockerfile                                0.0s
- => => transferring dockerfile: 1.48kB                                                         0.0s
- => [app] resolve image config for docker-image://docker.io/docker/dockerfile:1.4              0.5s
- => CACHED [migrations] docker-image://docker.io/docker/dockerfile:1.4@sha256:9ba7531bd80fb0a  0.0s
- => [app internal] load .dockerignore                                                          0.1s
- => => transferring context: 191B                                                              0.0s
- => [app internal] load build definition from Dockerfile                                       0.0s
- => => transferring dockerfile: 1.48kB                                                         0.0s
- => [migrations internal] load build definition from Dockerfile                                0.0s
- => => transferring dockerfile: 1.48kB                                                         0.0s
- => [migrations internal] load .dockerignore                                                   0.1s
- => => transferring context: 191B                                                              0.0s
- => [migrations internal] load metadata for docker.io/library/python:3.11-slim                 0.5s
- => [app internal] load build context                                                          0.0s
- => => transferring context: 13.81kB                                                           0.0s
- => [migrations builder 1/7] FROM docker.io/library/python:3.11-slim@sha256:e4676722fba839e2e  0.0s
- => [migrations internal] load build context                                                   0.0s
- => => transferring context: 13.81kB                                                           0.0s
- => CACHED [app builder 6/7] RUN poetry install --no-root --no-interaction --no-ansi --only m  0.0s
- => [app builder 7/7] COPY . .                                                                 0.0s
- => CACHED [app builder 2/7] WORKDIR /app                                                      0.0s
- => CACHED [app builder 3/7] RUN apt-get update && apt-get install -y --no-install-recommends  0.0s
- => CACHED [app builder 4/7] RUN curl -sSL https://install.python-poetry.org | python3 - &&    0.0s
- => CACHED [app builder 5/7] COPY pyproject.toml poetry.lock* ./                               0.0s
- => CACHED [app runtime 2/7] RUN apt-get update && apt-get install -y --no-install-recommends  0.0s
- => CACHED [app runtime 3/7] RUN groupadd -r appuser && useradd -r -g appuser -u 1000 appuser  0.0s
- => CACHED [app runtime 4/7] WORKDIR /app                                                      0.0s
- => CACHED [app runtime 5/7] COPY --from=builder --chown=appuser:appuser /app/.venv /app/.ven  0.0s
- => [app runtime 6/7] COPY --chown=appuser:appuser . .                                         0.1s
- => [app runtime 7/7] RUN chmod -R 755 /app &&     chmod -R 500 /app/app                      10.1s
- => [migrations] exporting to image                                                            0.7s
- => => exporting layers                                                                        0.6s
- => => writing image sha256:56e90881ce9c54039846851dfb20d2d3d03991be9206086de3684ce51e44263e   0.0s
- => => naming to docker.io/library/hse-secdev-course-migrations                                0.0s
- => [app] exporting to image                                                                   0.6s
- => => exporting layers                                                                        0.5s
- => => writing image sha256:57db2e810d193f91451da5455804871509e440b1bc7c095e367190cd9b0e399b   0.0s
- => => naming to docker.io/library/hse-secdev-course-app                                       0.0s
- => [app] resolving provenance for metadata file                                               0.0s
- => [migrations] resolving provenance for metadata file                                        0.0s
-[+] Running 5/5
- ✔ hse-secdev-course-migrations              Built                                             0.0s 
- ✔ hse-secdev-course-app                     Built                                             0.0s 
- ✔ Container hse-secdev-course-postgres-1    Recre...                                          0.3s 
- ✔ Container hse-secdev-course-migrations-1  Rec...                                            0.1s 
- ✔ Container hse-secdev-course-app-1         Recreated                                         0.1s 
-Attaching to app-1
-app-1  | INFO:     Started server process [1]
-app-1  | INFO:     Waiting for application startup.
-app-1  | INFO:     Application startup complete.
-app-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-app-1  | INFO:     127.0.0.1:41392 - "GET /health HTTP/1.1" 200 OK
+app-1  | INFO:     127.0.0.1:43426 - "GET /health HTTP/1.1" 200 OK
+app-1  | INFO:     127.0.0.1:44816 - "GET /health HTTP/1.1" 200 OK
+app-1  | INFO:     127.0.0.1:37090 - "GET /health HTTP/1.1" 200 OK
