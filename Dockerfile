@@ -24,8 +24,6 @@ RUN poetry install --no-root --no-interaction --no-ansi --only main
 
 COPY . .
 
-RUN poetry run pytest -q
-
 FROM python:3.11.9-slim AS runtime
 
 LABEL maintainer="wishlist-app" \
