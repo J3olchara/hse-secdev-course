@@ -9,11 +9,13 @@ class Settings:
 
     # Database settings
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "wishlist_user")
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "wishlist_password")
+    POSTGRES_PASSWORD: str = os.getenv(
+        "POSTGRES_PASSWORD", "wishlist_password"
+    )
     POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "localhost")
     POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", "5432")
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "wishlist_db")
-    
+
     @property
     def DATABASE_URL(self) -> str:
         return f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
