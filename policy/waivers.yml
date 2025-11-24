@@ -1,0 +1,19 @@
+waivers:
+  - id: "CVE-2024-53861"
+    package: "werkzeug"
+    version: "3.1.3"
+    severity: "High"
+    reason: "Используется только в dev окружении для локальной разработки, в проде nginx"
+    issue: "https://github.com/arseniizxc/hse-secdev-course/issues/1"
+    expires_at: "2025-12-31"
+    approved_by: "student@hse.ru"
+
+  - id: "CVE-2024-27322"
+    package: "pydantic"
+    version: "2.10.3"
+    severity: "Medium"
+    reason: "Транзитивная зависимость от FastAPI. Нет патча в стабильной версии, оценка рисков показала что вектор атаки не применим к нашему API"
+    issue: "https://github.com/arseniizxc/hse-secdev-course/issues/2"
+    expires_at: "2025-06-30"
+    approved_by: "student@hse.ru"
+
