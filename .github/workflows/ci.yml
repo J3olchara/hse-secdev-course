@@ -19,7 +19,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.11", "3.12"]
-    
+
     steps:
       - uses: actions/checkout@v4
 
@@ -79,7 +79,7 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+
     steps:
       - uses: actions/checkout@v4
 

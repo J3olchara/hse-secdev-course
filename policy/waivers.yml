@@ -1,0 +1,18 @@
+waivers:
+  - id: "GHSA-6c5p-j8vq-pqhj"
+    package: "python-jose"
+    version: "3.3.0"
+    severity: "Critical"
+    reason: "Используется для JWT токенов. Проверили - наша реализация не подвержена из-за дополнительных проверок в auth слое. Обновление требует рефакторинга т.к. новые версии breaking changes"
+    issue: "https://github.com/J3olchara/hse-secdev-course/issues/3"
+    expires_at: "2026-01-31"
+    approved_by: "student@hse.ru"
+
+  - id: "GHSA-2jv5-9r88-3w3p"
+    package: "python-multipart"
+    version: "0.0.6"
+    severity: "High"
+    reason: "Транзитивная зависимость FastAPI для file uploads. В продакшене у нас отключена загрузка файлов через API"
+    issue: "https://github.com/J3olchara/hse-secdev-course/issues/4"
+    expires_at: "2025-12-31"
+    approved_by: "student@hse.ru"
