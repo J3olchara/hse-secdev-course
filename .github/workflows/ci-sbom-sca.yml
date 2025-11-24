@@ -37,12 +37,12 @@ jobs:
           set -e
           docker run --rm -v $PWD:/work -w /work anchore/grype:latest \
             sbom:/work/EVIDENCE/P09/sbom.json -o json > EVIDENCE/P09/sca_report.json || true
-          
+
           echo "# SCA Summary" > EVIDENCE/P09/sca_summary.md
           echo "" >> EVIDENCE/P09/sca_summary.md
           echo "Generated: $(date)" >> EVIDENCE/P09/sca_summary.md
           echo "" >> EVIDENCE/P09/sca_summary.md
-          
+
           if [ -s EVIDENCE/P09/sca_report.json ]; then
             jq -r '[.matches[].vulnerability.severity] | group_by(.) | map({(.[0]): length}) | add' \
               EVIDENCE/P09/sca_report.json >> EVIDENCE/P09/sca_summary.md 2>/dev/null || echo "No vulnerabilities found or jq failed" >> EVIDENCE/P09/sca_summary.md
@@ -56,4 +56,3 @@ jobs:
         with:
           name: P09_EVIDENCE
           path: EVIDENCE/P09
-
