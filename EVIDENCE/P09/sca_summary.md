@@ -1,18 +1,25 @@
 # SCA Summary
 
-Generated: Mon Nov 24 18:03:53 UTC 2025
+**Generated:** Mon Nov 24 18:15:09 UTC 2025
+**Commit:** c7c3b58f5eed8748c848f300a2459d674a247840
+**Branch:** p09-sbom-sca
+
+## Vulnerability Count
 
 {
   "Critical": 1,
   "High": 6,
   "Medium": 2
 }
-- High: GHSA-2jv5-9r88-3w3p in python-multipart@0.0.6
-- High: GHSA-2jv5-9r88-3w3p in python-multipart@0.0.6
-- Critical: GHSA-6c5p-j8vq-pqhj in python-jose@3.3.0
+
+## Critical and High Severity Issues
+
 - High: GHSA-wj6h-64fc-37mp in ecdsa@0.19.1
+- Critical: GHSA-6c5p-j8vq-pqhj in python-jose@3.3.0
 - High: GHSA-59g5-xgcq-4qw3 in python-multipart@0.0.6
 - High: GHSA-59g5-xgcq-4qw3 in python-multipart@0.0.6
+- High: GHSA-2jv5-9r88-3w3p in python-multipart@0.0.6
+- High: GHSA-2jv5-9r88-3w3p in python-multipart@0.0.6
 - High: GHSA-f96h-pmfr-66vw in starlette@0.38.6
 
 ## Комментарий
@@ -25,3 +32,5 @@ python-multipart тоже требует внимания, там несколь
 1. Обновить python-multipart до последней версии если есть фикс
 2. Проверить можем ли обновить python-jose или нужен waiver
 3. Остальные уязвимости оценить по реальным рискам для нашего проекта
+
+Детальные решения см. в policy/waivers.yml

@@ -1,0 +1,5 @@
+SBOM generated for commit: c7c3b58f5eed8748c848f300a2459d674a247840
+Branch: p09-sbom-sca
+Timestamp: 2025-11-24T18:15:09+00:00
+Syft version: v1.18.1
+Grype version: v0.84.0
