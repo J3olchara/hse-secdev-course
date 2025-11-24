@@ -1,38 +1,96 @@
 name: CI
+
 on:
-  pull_request:
   push:
-    branches: [main]
+  pull_request:
+
 permissions:
   contents: read
+
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.11", "3.12"]
+    
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: "pip"
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Cache poetry deps
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-py${{ matrix.python-version }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-py${{ matrix.python-version }}-poetry-
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt -r requirements-dev.txt
+          poetry install --no-interaction
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://test:test@localhost/testdb' }}
 
-      - name: Lint & Format
+      - name: Run linters
         run: |
-          ruff check --output-format=github .
-          black --check .
-          isort --check-only .
+          poetry run ruff check .
+          poetry run black --check .
+          poetry run isort --check-only .
 
-      - name: Tests
-        run: pytest -q
+      - name: Run tests
+        run: |
+          mkdir -p reports
+          poetry run pytest -q --maxfail=1 --disable-warnings \
+            --junitxml=reports/junit.xml \
+            --cov=app \
+            --cov-report=xml:reports/coverage.xml \
+            --cov-report=html:reports/htmlcov \
+            --html=reports/pytest-report.html --self-contained-html
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'sqlite:///test.db' }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret-key-do-not-use-in-prod' }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY || 'test-app-secret' }}
 
-      - name: Pre-commit (all files)
-        run: pre-commit run --all-files
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-py${{ matrix.python-version }}
+          path: reports/**
+
+  deploy-staging:
+    needs: test
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mock staging deployment
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          echo "Environment: staging"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Deployment URL: https://staging.wishlist-api.example.com"
+          echo "✅ Deployment completed successfully (mock)"
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY || 'mock-deploy-key' }}
+          STAGING_URL: ${{ vars.STAGING_URL || 'https://staging.wishlist-api.example.com' }}
