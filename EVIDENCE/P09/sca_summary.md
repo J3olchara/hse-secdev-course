@@ -24,7 +24,7 @@
 
 ## Комментарий
 
-Нашлось довольно много проблем, особенно в python-multipart и python-jose. 
+Нашлось довольно много проблем, особенно в python-multipart и python-jose.
 Критичная уязвимость в python-jose связана с обработкой JWT токенов - нужно обновить или сделать waiver.
 python-multipart тоже требует внимания, там несколько High severity.
 

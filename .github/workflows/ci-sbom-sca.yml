@@ -31,7 +31,7 @@ jobs:
         run: |
           docker run --rm -v $PWD:/work -w /work anchore/syft:v1.18.1 \
             packages dir:. -o cyclonedx-json > EVIDENCE/P09/sbom.json
-          
+
           echo "SBOM generated for commit: ${{ github.sha }}" > EVIDENCE/P09/metadata.txt
           echo "Branch: ${{ github.ref_name }}" >> EVIDENCE/P09/metadata.txt
           echo "Timestamp: $(date -Iseconds)" >> EVIDENCE/P09/metadata.txt
