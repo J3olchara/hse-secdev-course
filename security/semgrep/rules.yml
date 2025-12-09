@@ -1,0 +1,131 @@
+# Кастомные правила для wishlist FastAPI проекта
+# Дополняют стандартный профиль p/ci
+
+rules:
+  # Реальная проблема - в нашем проекте есть использование f-strings для SQL
+  - id: fastapi-sql-injection-fstring
+    languages: [python]
+    message: "SQL через f-string - классика жанра. Используй параметризованные запросы, братан"
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: |
+              execute(f"... {$VAR} ...")
+          - pattern: |
+              execute(f'... {$VAR} ...')
+          - pattern: |
+              raw(f"... {$VAR} ...")
+          - pattern: |
+              text(f"... {$VAR} ...")
+    metadata:
+      category: security
+      cwe: "CWE-89: SQL Injection"
+      confidence: HIGH
+
+  # У нас в проекте есть хардкоженные секреты для dev-режима
+  - id: hardcoded-secrets-in-python
+    languages: [python]
+    message: "Застрявший секрет в коде. Переноси в переменные окружения, даже если это dev"
+    severity: WARNING
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $VAR = "...secret..."
+          - pattern: |
+              $VAR = "...SECRET..."
+          - pattern: |
+              $VAR = "...password..."
+          - pattern: |
+              $VAR = "...PASSWORD..."
+          - pattern: |
+              $VAR = "...token..."
+          - pattern: |
+              $VAR = "...api_key..."
+      - pattern-not: $VAR = "TEST_SECRET_DO_NOT_USE"
+      - pattern-not: $VAR = "..."
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+
+  # Критично - логирование может содержать PII
+  - id: logging-sensitive-data
+    languages: [python]
+    message: "Осторожно с логами - может утечь password или token из request/user данных"
+    severity: WARNING
+    patterns:
+      - pattern-either:
+          - pattern: |
+              logging.$METHOD(..., $OBJ.password, ...)
+          - pattern: |
+              logger.$METHOD(..., $OBJ.password, ...)
+          - pattern: |
+              print(..., $OBJ.password, ...)
+          - pattern: |
+              logging.$METHOD(..., $OBJ.token, ...)
+          - pattern: |
+              logger.$METHOD(..., $OBJ.token, ...)
+    metadata:
+      category: security
+      cwe: "CWE-532: Information Exposure Through Log Files"
+
+  # Опасные функции которых быть не должно
+  - id: dangerous-execution-functions
+    languages: [python]
+    message: "eval() или exec() - это прям совсем плохо. Ищи альтернативу"
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: eval(...)
+          - pattern: exec(...)
+          - pattern: __import__($X)
+          - pattern: compile($X, ...)
+      - pattern-not-inside: |
+          if False:
+            ...
+    metadata:
+      category: security
+      cwe: "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code"
+      confidence: HIGH
+
+  # os.system - прямая дорога к command injection
+  - id: os-system-command-injection
+    languages: [python]
+    message: "os.system() с пользовательским вводом = RCE. Используй subprocess с shell=False"
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: os.system($CMD)
+          - pattern: os.popen($CMD)
+          - pattern: subprocess.call($CMD, ..., shell=True, ...)
+          - pattern: subprocess.run($CMD, ..., shell=True, ...)
+    metadata:
+      category: security
+      cwe: "CWE-78: OS Command Injection"
+      confidence: HIGH
+
+  # JWT без проверки - видел в коде что может быть
+  - id: jwt-decode-without-verify
+    languages: [python]
+    message: "jwt.decode без verify - любой может подделать токен. Проверяй всегда"
+    severity: ERROR
+    patterns:
+      - pattern: jwt.decode($TOKEN, ..., verify=False, ...)
+    metadata:
+      category: security
+      cwe: "CWE-347: Improper Verification of Cryptographic Signature"
+
+  # Слабые алгоритмы хеширования
+  - id: weak-hashing-algorithm
+    languages: [python]
+    message: "MD5/SHA1 для паролей - это 2005 год. Argon2 уже есть в проекте, используй его"
+    severity: WARNING
+    patterns:
+      - pattern-either:
+          - pattern: hashlib.md5(...)
+          - pattern: hashlib.sha1(...)
+      - pattern-not-inside: |
+          # ETAG or non-security use
+          ...
+    metadata:
+      category: security
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
