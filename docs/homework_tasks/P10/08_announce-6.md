@@ -1,8 +1,8 @@
 # Анонс для Classroom/LMS — P10
 
-**Тема:** SAST & Secrets (Semgrep + Gitleaks в CI)  
-**Что сдаём:** PR `p10-sast-secrets → main` + workflow `ci-sast-secrets.yml` и артефакты в `EVIDENCE/P10/` (`semgrep.sarif`, `gitleaks.json`, опционально `sast_summary.md`)  
-**Баллы:** см. чек-лист P10 • Модуль DevSecOps/качество кода (SAST & secrets scanning)  
+**Тема:** SAST & Secrets (Semgrep + Gitleaks в CI)
+**Что сдаём:** PR `p10-sast-secrets → main` + workflow `ci-sast-secrets.yml` и артефакты в `EVIDENCE/P10/` (`semgrep.sarif`, `gitleaks.json`, опционально `sast_summary.md`)
+**Баллы:** см. чек-лист P10 • Модуль DevSecOps/качество кода (SAST & secrets scanning)
 **Дедлайн:** укажет преподаватель
 
 Ссылки:

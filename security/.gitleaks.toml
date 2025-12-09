@@ -23,24 +23,24 @@ regexes = [
   "TEST_SECRET_DO_NOT_USE",
   "test-secret-key",
   "fake-token-for-tests",
-  
+
   # Да, это тот самый dev-ключ который торчит в config.py для локалки
   # В проде он и так из env берется, так что это не уязвимость
   "dev-secret-key-DO-NOT-USE-IN-PRODUCTION",
-  
+
   # JWT примеры и фейковые токены в тестах
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.*",
-  
+
   # Дефолтные значения для docker-compose (не используются в проде)
   "wishlist_password",
   "wishlist_user",
-  
+
   # Placeholder'ы и примеры из документации
   "your-secret-key-here",
   "change-me-in-production",
   "example.*secret",
   "SECRET_KEY_HERE",
-  
+
   # Технические строки которые выглядят как секреты но не являются
   "ALGORITHM",
   "SECRET_KEY",
