@@ -7,6 +7,11 @@ on:
       - "app/**"
       - "src/**"
       - ".github/workflows/ci-p11-dast.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - "src/**"
+      - ".github/workflows/ci-p11-dast.yml"
 
 permissions:
   contents: read
