@@ -1,0 +1,91 @@
+name: Security - DAST (P11, ZAP baseline)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "app/**"
+      - "src/**"
+      - ".github/workflows/ci-p11-dast.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - "src/**"
+      - ".github/workflows/ci-p11-dast.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dast_p11:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure evidence dirs
+        run: |
+          mkdir -p EVIDENCE/P11
+          mkdir -p zap_reports
+          chmod 777 zap_reports
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run app
+        run: |
+          uvicorn app.main:app --host 0.0.0.0 --port 8080 &
+          timeout 30 bash -c 'until curl -sf http://localhost:8080/health; do sleep 1; done'
+          echo "App started successfully, checking endpoints:"
+          curl -v http://localhost:8080/health
+          curl -I http://localhost:8080/ || echo "Root path check failed, continuing..."
+
+      - name: ZAP Baseline
+        run: |
+          docker run --rm --network host \
+            -v ${{ github.workspace }}/zap_reports:/zap/wrk:rw \
+            -u zap \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+              -t http://localhost:8080 \
+              -r zap_baseline.html \
+              -J zap_baseline.json \
+              -d
+        continue-on-error: true
+
+      - name: Move ZAP reports
+        if: always()
+        run: |
+          echo "Contents of zap_reports directory:"
+          ls -la zap_reports/ || echo "zap_reports directory not found"
+          if [ -f zap_reports/zap_baseline.html ]; then
+            cp zap_reports/zap_baseline.html EVIDENCE/P11/
+            echo "Copied zap_baseline.html"
+          fi
+          if [ -f zap_reports/zap_baseline.json ]; then
+            cp zap_reports/zap_baseline.json EVIDENCE/P11/
+            echo "Copied zap_baseline.json"
+          fi
+          echo "Contents of EVIDENCE/P11:"
+          ls -la EVIDENCE/P11/
+
+      - name: Upload P11 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P11_EVIDENCE
+          path: EVIDENCE/P11
+          if-no-files-found: warn
