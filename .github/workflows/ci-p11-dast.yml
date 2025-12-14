@@ -50,7 +50,21 @@ jobs:
               -r zap_baseline.html \
               -J zap_baseline.json \
               -d || true
-          mv zap_baseline.* EVIDENCE/P11/ || true
+        continue-on-error: true
+
+      - name: Move ZAP reports
+        if: always()
+        run: |
+          ls -la zap_baseline.* || echo "ZAP reports not found in root"
+          if [ -f zap_baseline.html ]; then
+            mv zap_baseline.html EVIDENCE/P11/
+            echo "Moved zap_baseline.html"
+          fi
+          if [ -f zap_baseline.json ]; then
+            mv zap_baseline.json EVIDENCE/P11/
+            echo "Moved zap_baseline.json"
+          fi
+          ls -la EVIDENCE/P11/
 
       - name: Upload P11 evidence
         if: always()
@@ -58,3 +72,4 @@ jobs:
         with:
           name: P11_EVIDENCE
           path: EVIDENCE/P11
+          if-no-files-found: warn
