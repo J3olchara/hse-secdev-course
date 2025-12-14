@@ -44,12 +44,12 @@ jobs:
 
       - name: ZAP Baseline
         run: |
-          docker run --rm --network host -v $PWD:/zap/wrk owasp/zap2docker-stable \
+          docker run --rm --network host -v $PWD:/zap/wrk:rw ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
               -t http://localhost:8080 \
               -r zap_baseline.html \
               -J zap_baseline.json \
-              -d || true
+              -d
         continue-on-error: true
 
       - name: Move ZAP reports
