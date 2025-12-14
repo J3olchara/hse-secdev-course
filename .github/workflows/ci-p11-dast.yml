@@ -25,7 +25,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Ensure evidence dirs
-        run: mkdir -p EVIDENCE/P11
+        run: |
+          mkdir -p EVIDENCE/P11
+          mkdir -p zap_reports
+          chmod 777 zap_reports
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -41,10 +44,16 @@ jobs:
         run: |
           uvicorn app.main:app --host 0.0.0.0 --port 8080 &
           timeout 30 bash -c 'until curl -sf http://localhost:8080/health; do sleep 1; done'
+          echo "App started successfully, checking endpoints:"
+          curl -v http://localhost:8080/health
+          curl -I http://localhost:8080/ || echo "Root path check failed, continuing..."
 
       - name: ZAP Baseline
         run: |
-          docker run --rm --network host -v $PWD:/zap/wrk:rw ghcr.io/zaproxy/zaproxy:stable \
+          docker run --rm --network host \
+            -v ${{ github.workspace }}/zap_reports:/zap/wrk:rw \
+            -u zap \
+            ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
               -t http://localhost:8080 \
               -r zap_baseline.html \
@@ -55,15 +64,17 @@ jobs:
       - name: Move ZAP reports
         if: always()
         run: |
-          ls -la zap_baseline.* || echo "ZAP reports not found in root"
-          if [ -f zap_baseline.html ]; then
-            mv zap_baseline.html EVIDENCE/P11/
-            echo "Moved zap_baseline.html"
+          echo "Contents of zap_reports directory:"
+          ls -la zap_reports/ || echo "zap_reports directory not found"
+          if [ -f zap_reports/zap_baseline.html ]; then
+            cp zap_reports/zap_baseline.html EVIDENCE/P11/
+            echo "Copied zap_baseline.html"
           fi
-          if [ -f zap_baseline.json ]; then
-            mv zap_baseline.json EVIDENCE/P11/
-            echo "Moved zap_baseline.json"
+          if [ -f zap_reports/zap_baseline.json ]; then
+            cp zap_reports/zap_baseline.json EVIDENCE/P11/
+            echo "Copied zap_baseline.json"
           fi
+          echo "Contents of EVIDENCE/P11:"
           ls -la EVIDENCE/P11/
 
       - name: Upload P11 evidence
