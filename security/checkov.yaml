@@ -1,0 +1,15 @@
+# Checkov configuration for P12
+# IaC security scanner (Kubernetes, Terraform, Dockerfile)
+
+quiet: false
+compact: true
+framework:
+  - kubernetes
+  - terraform
+  - dockerfile
+
+skip-check: []
+# Примеры check IDs, которые можно пропустить:
+# - CKV_K8S_8    # Liveness Probe Should Be Configured
+# - CKV_K8S_9    # Readiness Probe Should Be Configured
+# - CKV_K8S_43   # Image should use digest
