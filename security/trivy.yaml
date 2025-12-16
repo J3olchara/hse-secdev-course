@@ -1,0 +1,13 @@
+# Trivy configuration for P12
+# Container image vulnerability scanner
+
+scan:
+  scanners:
+    - vuln
+    - config
+  severity:
+    - CRITICAL
+    - HIGH
+
+format: "json"
+

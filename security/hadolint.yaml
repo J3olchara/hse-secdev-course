@@ -1,0 +1,8 @@
+# Hadolint configuration for P12
+# Dockerfile security best practices linter
+
+ignored: []
+# Примеры правил, которые можно игнорировать при необходимости:
+# - DL3008  # Pin versions in apt-get install (если используется pip/poetry)
+# - DL3018  # Pin versions in apk add
+
